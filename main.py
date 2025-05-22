@@ -2,6 +2,7 @@ import os
 import hashlib
 import json
 import argparse
+import sys
 
 def compute_hash(filepath, algo='sha256'):
     hash_func = hashlib.new(algo)
@@ -44,11 +45,27 @@ def compare_hashes(baseline, current):
 
 def main():
     parser = argparse.ArgumentParser(description="Hash Checker")
-    parser.add_argument('directory', help="Directory to scan")
+    parser.add_argument('directory', nargs='?', help="Directory to scan")
     parser.add_argument('--algo', choices=['sha256', 'md5'], default='sha256', help="Hash algorithm")
     parser.add_argument('--baseline', default='baseline.json', help="Baseline file")
     parser.add_argument('--init', action='store_true', help="Initialize baseline")
+    parser.add_argument('--file', help="Hash a single file and print its hash")
+    # Show help if no arguments are provided
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
+        sys.exit(0)
     args = parser.parse_args()
+
+    if args.file:
+        if not os.path.isfile(args.file):
+            print(f"File not found: {args.file}")
+            sys.exit(1)
+        hash_value = compute_hash(args.file, args.algo)
+        print(f"{args.algo.upper()} hash of {args.file}: {hash_value}")
+        sys.exit(0)
+
+    if not args.directory:
+        parser.error("the following arguments are required: directory (unless using --file)")
 
     if args.init:
         hashes = scan_directory(args.directory, args.algo)

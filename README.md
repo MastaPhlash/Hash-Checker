@@ -31,7 +31,20 @@ Hash Checker is a simple Python tool for monitoring file integrity. It calculate
      python main.py C:\important\files
      ```
 
-6. **Optional arguments:**
+6. **Hash a single file** (for testing or verification):
+   ```
+   python main.py --file <path_to_file>
+   ```
+   - Example:
+     ```
+     python main.py --file C:\important\files\config.txt
+     ```
+   - You can also specify the algorithm:
+     ```
+     python main.py --file C:\important\files\config.txt --algo md5
+     ```
+
+7. **Optional arguments:**
    - `--algo md5` : Use MD5 instead of SHA-256.
    - `--baseline <file>` : Specify a custom baseline file.
 
@@ -48,6 +61,11 @@ Changes detected:
 MODIFIED: C:\important\files\config.txt
 REMOVED: C:\important\files\oldfile.log
 NEW: C:\important\files\newfile.docx
+```
+
+**Hash a single file:**
+```
+SHA256 hash of C:\important\files\config.txt: 3a7bd3e2360a3d...
 ```
 
 ---
