@@ -48,6 +48,14 @@ Hash Checker is a simple Python tool for monitoring file integrity. It calculate
    - `--algo md5` : Use MD5 instead of SHA-256.
    - `--baseline <file>` : Specify a custom baseline file.
 
+**Note:**  
+If your directory or file path contains spaces, enclose the path in quotes.  
+For example:
+```
+python main.py "C:\Coding\Python\Hash Checker\Hash-Checker" --init
+python main.py --file "C:\Coding\Python\Hash Checker\Hash-Checker\config.txt"
+```
+
 ## Example outputs
 
 **No changes detected:**

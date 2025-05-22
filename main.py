@@ -27,8 +27,17 @@ def save_baseline(hashes, baseline_file):
         json.dump(hashes, f, indent=2)
 
 def load_baseline(baseline_file):
-    with open(baseline_file, 'r') as f:
-        return json.load(f)
+    # Check if the baseline file exists before loading
+    if not os.path.isfile(baseline_file):
+        print(f"Baseline file '{baseline_file}' does not exist. Please initialize with --init.")
+        sys.exit(1)
+    try:
+        with open(baseline_file, 'r') as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        # Handle empty or corrupted baseline file
+        print(f"Baseline file '{baseline_file}' is empty or corrupted. Please re-initialize with --init.")
+        sys.exit(1)
 
 def compare_hashes(baseline, current):
     changed = []
@@ -59,6 +68,7 @@ def main():
         sys.exit(0)
     args = parser.parse_args()
 
+    # If --file is specified, hash the given file and exit
     if args.file:
         if not os.path.isfile(args.file):
             print(f"File not found: {args.file}")
@@ -67,14 +77,17 @@ def main():
         print(f"{args.algo.upper()} hash of {args.file}: {hash_value}")
         sys.exit(0)
 
+    # Require directory argument unless --file is used
     if not args.directory:
         parser.error("the following arguments are required: directory (unless using --file)")
 
     if args.init:
+        # Initialize and save baseline hashes
         hashes = scan_directory(args.directory, args.algo)
         save_baseline(hashes, args.baseline)
         print(f"Baseline saved to {args.baseline}")
     else:
+        # Load baseline and compare with current hashes
         baseline = load_baseline(args.baseline)
         current = scan_directory(args.directory, args.algo)
         changes = compare_hashes(baseline, current)
