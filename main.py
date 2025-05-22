@@ -1,17 +1,25 @@
 import os
-import hashlib
-import json
-import argparse
 import sys
+import json
+import hashlib
+import argparse
 
 def compute_hash(filepath, algo='sha256'):
+    """Compute the hash of a file using the specified algorithm."""
     hash_func = hashlib.new(algo)
     with open(filepath, 'rb') as f:
-        while chunk := f.read(8192):
+        while True:
+            chunk = f.read(8192)
+            if not chunk:
+                break
             hash_func.update(chunk)
     return hash_func.hexdigest()
 
 def scan_directory(directory, algo='sha256'):
+    """
+    Recursively scan a directory and compute hashes for all files.
+    Returns a dict mapping file paths to their hashes.
+    """
     hashes = {}
     for root, _, files in os.walk(directory):
         for name in files:
@@ -23,11 +31,15 @@ def scan_directory(directory, algo='sha256'):
     return hashes
 
 def save_baseline(hashes, baseline_file):
+    """Save the hashes dictionary to a JSON file."""
     with open(baseline_file, 'w') as f:
         json.dump(hashes, f, indent=2)
 
 def load_baseline(baseline_file):
-    # Check if the baseline file exists before loading
+    """
+    Load the baseline hashes from a JSON file.
+    Handles missing or corrupted files gracefully.
+    """
     if not os.path.isfile(baseline_file):
         print(f"Baseline file '{baseline_file}' does not exist. Please initialize with --init.")
         sys.exit(1)
@@ -35,11 +47,14 @@ def load_baseline(baseline_file):
         with open(baseline_file, 'r') as f:
             return json.load(f)
     except json.JSONDecodeError:
-        # Handle empty or corrupted baseline file
         print(f"Baseline file '{baseline_file}' is empty or corrupted. Please re-initialize with --init.")
         sys.exit(1)
 
 def compare_hashes(baseline, current):
+    """
+    Compare baseline and current hashes.
+    Returns a list of (path, status) tuples for changed, removed, or new files.
+    """
     changed = []
     for path, old_hash in baseline.items():
         new_hash = current.get(path)
