@@ -49,7 +49,10 @@ def main():
     parser.add_argument('--algo', choices=['sha256', 'md5'], default='sha256', help="Hash algorithm")
     parser.add_argument('--baseline', default='baseline.json', help="Baseline file")
     parser.add_argument('--init', action='store_true', help="Initialize baseline")
-    parser.add_argument('--file', help="Hash a single file and print its hash")
+    parser.add_argument(
+        '--file',
+        help="Hash a single file and print its hash (for testing or verification; skips directory scan)"
+    )
     # Show help if no arguments are provided
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
